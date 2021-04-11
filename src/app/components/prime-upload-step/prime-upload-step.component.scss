@@ -1,0 +1,17 @@
+:host {
+    .card {
+        background-color: var(--surface-e);
+
+        padding: 1em 1em 1em 1em;
+        text-align: center;
+    }
+
+    ::ng-deep p-fileUpload {
+        width: 100%;
+
+        .upload-banner {
+            font-size: 2rem;
+            opacity: 0.4;
+        }
+    }
+}

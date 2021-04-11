@@ -1,0 +1,31 @@
+<div class="card">
+
+    <div *ngIf="!isExtracting" class="p-d-flex p-jc-center">
+
+        <p-fileUpload name="myfile[]" customUpload="true" (uploadHandler)="onUpload($event)">
+            <ng-template pTemplate="toolbar">
+            </ng-template>
+
+            <ng-template let-file pTemplate="file">
+                <i class="pi pi-file-excel"></i>
+                {{ file.name }}
+            </ng-template>
+
+            <ng-template pTemplate="content" let-files>
+                <ng-container *ngIf="files != null && files.length === 0">
+                    <div class="upload-banner">
+                        <span>Drag & Drop</span>
+                    </div>
+                </ng-container>
+            </ng-template>
+        </p-fileUpload>
+
+    </div>
+
+    <div *ngIf="isExtracting" class="p-d-flex p-jc-center">
+        <p-progressSpinner>
+
+        </p-progressSpinner>
+    </div>
+
+</div>
