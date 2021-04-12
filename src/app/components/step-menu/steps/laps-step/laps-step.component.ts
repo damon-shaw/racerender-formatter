@@ -3,27 +3,43 @@ import { Router } from '@angular/router';
 import { Lap, Penalty, PenaltyType, Sector, Session } from 'src/app/components/step-menu/race';
 import { Rounder } from 'src/app/components/step-menu/transform/rounder';
 import { RaceService } from 'src/app/services/race.service';
+import { SteppablePage } from '../../interface/SteppablePage.interface';
 import { SessionTransformService } from '../../transform/sessiontransform.service';
 
 @Component({
   selector: 'app-laps-step',
   templateUrl: './laps-step.component.html',
-  styleUrls: ['./laps-step.component.css']
+  styleUrls: ['./laps-step.component.scss']
 })
-export class LapsStepComponent implements OnInit {
-  lapSelect: string = "bestGhost";
+export class LapsStepComponent implements SteppablePage, OnInit {
+  public lapSelect: string = "bestGhost";
 
-  selectedSessions: Session[];
+  /**
+   * A list of the currently selected sessions.
+   */
+  public selectedSessions: Session[];
   // penaltyTypes: Object[] = Object.keys(PenaltyType).map(key => ({ label: PenaltyType[key], value: key}));
   // penaltyTypes: PenaltyType[] = [PenaltyType.TIME, PenaltyType.DNF, PenaltyType.OFF, PenaltyType.RERUN];
-  expandedSessions = {};
+  
+  /**
+   * TODO: Populate this documentation.
+   */
+  public expandedSessions = {};
 
-  constructor(public raceService: RaceService, private router: Router, private sessionTransformService: SessionTransformService) { }
+  constructor(
+	  public raceService: RaceService,
+	  private router: Router,
+	  private sessionTransformService: SessionTransformService
+	) { }
 
   ngOnInit(): void {
-    if (this.raceService.race == null) {
-      this.router.navigate(['columns-step']);
-    }
+
+    // If the race object isn't defined, there's nothing for us to work with.
+    // Return to the previous step.
+    if (this.raceService.race == null)
+      this.stepBackward();
+
+    // Initialize the member variables and do any necessary startup work.
     this.expandedSessions = {};
     this.raceService.race.sessions.forEach(session => (this.expandedSessions[session.sessionNum] = true));
     this.selectBestAndPrevious();
@@ -40,6 +56,28 @@ export class LapsStepComponent implements OnInit {
   get best(): Lap {
     return this.raceService.race.best;
   }
+
+  /**
+   * @inheritdoc
+   */
+  public stepForward(): void {
+    // Label all selected 
+	  this.selectedSessions.forEach(session => {
+      session.isExport = true;
+      this.sessionTransformService.transformSession(session);
+    });
+
+    if (this.selectedSessions.length > 0)
+      this.router.navigate(['download-step']);
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public stepBackward(): void {
+	  this.router.navigate(['columns-step']);
+  }
+
 
   nextPage() {
     this.selectedSessions.forEach(session => {
